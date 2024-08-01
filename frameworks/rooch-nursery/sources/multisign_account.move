@@ -11,6 +11,8 @@ module rooch_nursery::multisign_account{
     use moveos_std::table_vec::{Self, TableVec};
     use moveos_std::table::{Self, Table};
     use moveos_std::bcs;
+    use bitcoin_move::opcode;
+    use bitcoin_move::script_buf::{Self, ScriptBuf};
     use rooch_framework::ecdsa_k1;
     use rooch_framework::bitcoin_address::{Self, BitcoinAddress};
 
@@ -144,6 +146,68 @@ module rooch_nursery::multisign_account{
         multisign_address
     }
 
+    fun create_multisign_script(threshold: u64, public_keys: &vector<vector<u8>>) : ScriptBuf {
+        let buf = script_buf::empty();
+        let idx = 0;
+        let len = vector::length(public_keys);
+        while(idx < len){
+            let public_key = *vector::borrow(public_keys, idx);
+            let x_only_key = sub_vector(&public_key, 1, 33);
+            if(script_buf::is_empty(&buf)){
+                script_buf::push_x_only_key(&mut buf, x_only_key);
+                script_buf::push(&mut buf, opcode::op_checksig());
+            }else{
+                script_buf::push_x_only_key(&mut buf, x_only_key);
+                script_buf::push(&mut buf, opcode::op_checksigadd());
+            };
+            idx = idx + 1;
+        };
+        script_buf::push_int(&mut buf, threshold);
+        script_buf::push(&mut buf, opcode::op_greaterthanorequal());
+        buf
+    }
+    
+    //TODO put this function in a more general module
+    fun sub_vector(bytes: &vector<u8>, start: u64, end: u64): vector<u8>{
+        let result = vector::empty();
+        let i = start;
+        while(i < end) {
+            vector::push_back(&mut result, *vector::borrow(bytes, i));
+            i = i + 1;
+        };
+        result
+    }
+
+    //TODO migrate this function to a suitable module
+    fun quick_sort(data: vector<vector<u8>>): vector<vector<u8>> {
+        if (vector::length(&data) <= 1) {
+            return data
+        };
+
+        let pivot = *vector::borrow(&data, 0);
+        let less = vector::empty();
+        let equal = vector::empty();
+        let greater = vector::empty();
+
+        while (vector::length(&data) > 0) {
+            let value = vector::remove(&mut data, 0);
+            let cmp = std::compare::cmp_bcs_bytes(&value, &pivot);
+            if (cmp == 2) {
+                vector::push_back(&mut less, value);
+            } else if (cmp == 0) {
+                vector::push_back(&mut equal, value);
+            } else {
+                vector::push_back(&mut greater, value);
+            };
+        };
+
+        let sortedData = vector::empty();
+        vector::append(&mut sortedData, quick_sort(less));
+        vector::append(&mut sortedData, equal);
+        vector::append(&mut sortedData, quick_sort(greater));
+        sortedData
+    }
+
     public fun is_participant(multisign_address: address, participant_address: address) : bool {
         if(!account::exists_at(multisign_address)){
             return false
@@ -243,4 +307,15 @@ module rooch_nursery::multisign_account{
         account::borrow_account(multisign_address)
     }
 
+    #[test]
+    fun test_create_multisign_script(){
+        let public_keys = vector::empty();
+        vector::push_back(&mut public_keys, x"0308839c624d3da34ae240086f60196409d619f285365cc3498fdd3a90b72599e4");
+        vector::push_back(&mut public_keys, x"0338121decf4ea2dbfd2ad1fe05a32a67448e78bf97a18bc107b4da177c27af752");
+        vector::push_back(&mut public_keys, x"03786e2d94b8aaac17b2846ea908a245ab8b3c9df7ff34be8c75c27beba8e1f579");
+        let buf = create_multisign_script(2, &public_keys);
+        std::debug::print(&buf);
+        let expect_result = x"2008839c624d3da34ae240086f60196409d619f285365cc3498fdd3a90b72599e4ac2038121decf4ea2dbfd2ad1fe05a32a67448e78bf97a18bc107b4da177c27af752ba20786e2d94b8aaac17b2846ea908a245ab8b3c9df7ff34be8c75c27beba8e1f579ba52a2";
+        assert!(script_buf::into_bytes(buf) == expect_result, 1000);
+    }
 }
