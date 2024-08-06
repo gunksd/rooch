@@ -3,7 +3,6 @@
 
 /// https://github.com/rust-bitcoin/rust-bitcoin/blob/71d92bdbb91693b7882f8cd4a7e874b4e6f9eb48/bitcoin/src/blockdata/opcodes.rs#L81
 module bitcoin_move::opcode{
-
         
     /// Push an empty array onto the stack.
     const OP_PUSHBYTES_0:u8 = 0x00;
@@ -11,9 +10,19 @@ module bitcoin_move::opcode{
         OP_PUSHBYTES_0
     }
 
+    /// A alias for OP_PUSHBYTES_0
+    public fun op_0() : u8 {
+        OP_PUSHBYTES_0
+    }
+
     /// Push the next byte as an array onto the stack.
     const OP_PUSHBYTES_1:u8 = 0x01;
     public fun op_pushbytes_1() : u8 {
+        OP_PUSHBYTES_1
+    }
+
+    /// A alias for OP_PUSHBYTES_1
+    public fun op_1() : u8 {
         OP_PUSHBYTES_1
     }
 
