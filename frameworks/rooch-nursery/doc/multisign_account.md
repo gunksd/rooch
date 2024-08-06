@@ -19,7 +19,8 @@ Bitcoin multisign account module
 -  [Function `sign_bitcoin_proposal`](#0xa_multisign_account_sign_bitcoin_proposal)
 
 
-<pre><code><b>use</b> <a href="">0x1::vector</a>;
+<pre><code><b>use</b> <a href="">0x1::compare</a>;
+<b>use</b> <a href="">0x1::vector</a>;
 <b>use</b> <a href="">0x2::account</a>;
 <b>use</b> <a href="">0x2::bcs</a>;
 <b>use</b> <a href="">0x2::object</a>;
@@ -28,6 +29,8 @@ Bitcoin multisign account module
 <b>use</b> <a href="">0x2::table_vec</a>;
 <b>use</b> <a href="">0x3::bitcoin_address</a>;
 <b>use</b> <a href="">0x3::ecdsa_k1</a>;
+<b>use</b> <a href="">0x4::opcode</a>;
+<b>use</b> <a href="">0x4::script_buf</a>;
 </code></pre>
 
 

@@ -151,6 +151,33 @@ We just keep the raw bytes of the address and do care about the network.
 
 
 
+<a name="0x3_bitcoin_address_PAY_LOAD_TYPE_PUBKEY_HASH"></a>
+
+
+
+<pre><code><b>const</b> <a href="bitcoin_address.md#0x3_bitcoin_address_PAY_LOAD_TYPE_PUBKEY_HASH">PAY_LOAD_TYPE_PUBKEY_HASH</a>: u8 = 0;
+</code></pre>
+
+
+
+<a name="0x3_bitcoin_address_PAY_LOAD_TYPE_SCRIPT_HASH"></a>
+
+
+
+<pre><code><b>const</b> <a href="bitcoin_address.md#0x3_bitcoin_address_PAY_LOAD_TYPE_SCRIPT_HASH">PAY_LOAD_TYPE_SCRIPT_HASH</a>: u8 = 1;
+</code></pre>
+
+
+
+<a name="0x3_bitcoin_address_PAY_LOAD_TYPE_WITNESS_PROGRAM"></a>
+
+
+
+<pre><code><b>const</b> <a href="bitcoin_address.md#0x3_bitcoin_address_PAY_LOAD_TYPE_WITNESS_PROGRAM">PAY_LOAD_TYPE_WITNESS_PROGRAM</a>: u8 = 2;
+</code></pre>
+
+
+
 <a name="0x3_bitcoin_address_PUBKEY_HASH_LEN"></a>
 
 
@@ -173,6 +200,7 @@ We just keep the raw bytes of the address and do care about the network.
 
 ## Function `new_p2pkh`
 
+TODO break: rename to p2pkh and add tests
 
 
 <pre><code><b>public</b> <b>fun</b> <a href="bitcoin_address.md#0x3_bitcoin_address_new_p2pkh">new_p2pkh</a>(pubkey_hash: <a href="">vector</a>&lt;u8&gt;): <a href="bitcoin_address.md#0x3_bitcoin_address_BitcoinAddress">bitcoin_address::BitcoinAddress</a>
@@ -184,6 +212,7 @@ We just keep the raw bytes of the address and do care about the network.
 
 ## Function `new_p2sh`
 
+TODO break: rename to p2sh and add tests
 
 
 <pre><code><b>public</b> <b>fun</b> <a href="bitcoin_address.md#0x3_bitcoin_address_new_p2sh">new_p2sh</a>(script_hash: <a href="">vector</a>&lt;u8&gt;): <a href="bitcoin_address.md#0x3_bitcoin_address_BitcoinAddress">bitcoin_address::BitcoinAddress</a>
@@ -195,6 +224,7 @@ We just keep the raw bytes of the address and do care about the network.
 
 ## Function `new_witness_program`
 
+TODO break: make this function private
 
 
 <pre><code><b>public</b> <b>fun</b> <a href="bitcoin_address.md#0x3_bitcoin_address_new_witness_program">new_witness_program</a>(program: <a href="">vector</a>&lt;u8&gt;): <a href="bitcoin_address.md#0x3_bitcoin_address_BitcoinAddress">bitcoin_address::BitcoinAddress</a>
@@ -317,6 +347,7 @@ Empty address is a special address that is used to if we parse address failed fr
 
 ## Function `verify_bitcoin_address_with_public_key`
 
+verify bitcoin address according to the pk bytes, the pk is Secp256k1 public key format.
 
 
 <pre><code><b>public</b> <b>fun</b> <a href="bitcoin_address.md#0x3_bitcoin_address_verify_bitcoin_address_with_public_key">verify_bitcoin_address_with_public_key</a>(bitcoin_addr: &<a href="bitcoin_address.md#0x3_bitcoin_address_BitcoinAddress">bitcoin_address::BitcoinAddress</a>, pk: &<a href="">vector</a>&lt;u8&gt;): bool
@@ -328,8 +359,7 @@ Empty address is a special address that is used to if we parse address failed fr
 
 ## Function `derive_multisig_pubkey_from_pubkeys`
 
-derive multisig public key from public keys.
-the public keys and result are Secp256k1 public key format.
+Deprecated: this function is deprecated.
 
 
 <pre><code><b>public</b> <b>fun</b> <a href="bitcoin_address.md#0x3_bitcoin_address_derive_multisig_pubkey_from_pubkeys">derive_multisig_pubkey_from_pubkeys</a>(public_keys: <a href="">vector</a>&lt;<a href="">vector</a>&lt;u8&gt;&gt;, threshold: u64): <a href="">vector</a>&lt;u8&gt;
@@ -343,5 +373,5 @@ the public keys and result are Secp256k1 public key format.
 
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="bitcoin_address.md#0x3_bitcoin_address_derive_bitcoin_taproot_address_from_pubkey">derive_bitcoin_taproot_address_from_pubkey</a>(xonly_pubkey: &<a href="">vector</a>&lt;u8&gt;): <a href="bitcoin_address.md#0x3_bitcoin_address_BitcoinAddress">bitcoin_address::BitcoinAddress</a>
+<pre><code><b>public</b> <b>fun</b> <a href="bitcoin_address.md#0x3_bitcoin_address_derive_bitcoin_taproot_address_from_pubkey">derive_bitcoin_taproot_address_from_pubkey</a>(pubkey: &<a href="">vector</a>&lt;u8&gt;): <a href="bitcoin_address.md#0x3_bitcoin_address_BitcoinAddress">bitcoin_address::BitcoinAddress</a>
 </code></pre>

@@ -27,6 +27,9 @@ module rooch_framework::bitcoin_address {
     const P2SH_ADDR_DECIMAL_PREFIX_MAIN: u8 = 5; // 0x05
     const P2SH_ADDR_DECIMAL_PREFIX_TEST: u8 = 196; // 0xc4
 
+    const PAY_LOAD_TYPE_PUBKEY_HASH: u8 = 0;
+    const PAY_LOAD_TYPE_SCRIPT_HASH: u8 = 1;
+    const PAY_LOAD_TYPE_WITNESS_PROGRAM: u8 = 2;
    
     #[data_struct]
     /// BitcoinAddress is a struct that represents a Bitcoin address.
@@ -35,25 +38,28 @@ module rooch_framework::bitcoin_address {
         bytes: vector<u8>,
     }
 
+    ///TODO break: rename to p2pkh and add tests
     public fun new_p2pkh(pubkey_hash: vector<u8>): BitcoinAddress{
         assert!(vector::length(&pubkey_hash) == PUBKEY_HASH_LEN, ErrorInvalidAddress);
         //we do not distinguish between mainnet and testnet in Move
-        let bytes = vector::singleton<u8>(P2PKH_ADDR_DECIMAL_PREFIX_MAIN);
+        let bytes = vector::singleton<u8>(PAY_LOAD_TYPE_PUBKEY_HASH);
         vector::append(&mut bytes, pubkey_hash);
         BitcoinAddress {
             bytes: bytes,
         }
     }
 
+    ///TODO break: rename to p2sh and add tests
     public fun new_p2sh(script_hash: vector<u8>): BitcoinAddress{
         assert!(vector::length(&script_hash) == SCRIPT_HASH_LEN, ErrorInvalidAddress);
-        let bytes = vector::singleton<u8>(P2SH_ADDR_DECIMAL_PREFIX_MAIN);
+        let bytes = vector::singleton<u8>(PAY_LOAD_TYPE_SCRIPT_HASH);
         vector::append(&mut bytes, script_hash);
         BitcoinAddress {
             bytes: bytes,
         }
     }
 
+    ///TODO break: make this function private
     public fun new_witness_program(program: vector<u8>): BitcoinAddress{
         BitcoinAddress {
             bytes: program,
@@ -68,12 +74,12 @@ module rooch_framework::bitcoin_address {
 
     public fun is_p2pkh(addr: &BitcoinAddress): bool {
         let bytes = &addr.bytes;
-        vector::length(bytes) == P2PKH_ADDR_BYTE_LEN && *vector::borrow(bytes, 0) == P2PKH_ADDR_DECIMAL_PREFIX_MAIN
+        vector::length(bytes) == P2PKH_ADDR_BYTE_LEN && *vector::borrow(bytes, 0) == PAY_LOAD_TYPE_PUBKEY_HASH
     }
 
     public fun is_p2sh(addr: &BitcoinAddress): bool {
         let bytes = &addr.bytes;
-        vector::length(bytes) == P2SH_ADDR_BYTE_LEN && *vector::borrow(bytes, 0) == P2SH_ADDR_DECIMAL_PREFIX_MAIN
+        vector::length(bytes) == P2SH_ADDR_BYTE_LEN && *vector::borrow(bytes, 0) == PAY_LOAD_TYPE_SCRIPT_HASH
     }
 
     public fun is_witness_program(addr: &BitcoinAddress): bool {
@@ -109,16 +115,15 @@ module rooch_framework::bitcoin_address {
         moveos_std::bcs::to_address(hash)
     }
 
-    // verify bitcoin address according to the pk bytes, the pk is Secp256k1 public key format.
+    /// verify bitcoin address according to the pk bytes, the pk is Secp256k1 public key format.
     public native fun verify_bitcoin_address_with_public_key(bitcoin_addr: &BitcoinAddress, pk: &vector<u8>): bool;
 
-    /// derive multisig public key from public keys. 
-    /// the public keys and result are Secp256k1 public key format.
+    /// Deprecated: this function is deprecated. 
     public native fun derive_multisig_pubkey_from_pubkeys(public_keys: vector<vector<u8>>, threshold: u64): vector<u8>;
  
     // derive bitcoin taproot address from a Secp256k1 pubkey
-    public native fun derive_bitcoin_taproot_address_from_pubkey(xonly_pubkey: &vector<u8>): BitcoinAddress;
-
+    public native fun derive_bitcoin_taproot_address_from_pubkey(pubkey: &vector<u8>): BitcoinAddress;
+    
     /// Parse the Bitcoin address string bytes to Move BitcoinAddress
     native fun parse(raw_addr: &vector<u8>): BitcoinAddress;
 
